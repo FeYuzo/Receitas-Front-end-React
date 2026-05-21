@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor Brutal | Revista Gastronômica (React)</title>
+    <meta name="description" content="Histórias e receitas clássicas revisitadas com paixão.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- React & Router via CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@remix-run/router@1.16.0/dist/router.umd.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-router@6.23.0/dist/umd/react-router.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-router-dom@6.23.0/dist/umd/react-router-dom.production.min.js" crossorigin></script>
+    <!-- Babel for JSX (Permite escrever React sem build step) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { HashRouter, Routes, Route, Link, useParams, useNavigate } = ReactRouterDOM;
+
+        // Base de Dados
+        const recipesData = {
+            feijoada: {
+                title: "Feijoada",
+                image: "zfeijoada.png",
+                ingredients: [
+                    "500g de feijão preto",
+                    "300g de carne seca dessalgada",
+                    "200g de costelinha de porco salgada",
+                    "150g de lombo de porco salgado",
+                    "2 paios cortados em rodelas",
+                    "1 linguiça calabresa em rodelas",
+                    "Folhas de louro frescas",
+                    "Alho, cebola e pimenta a gosto"
+                ],
+                instructions: (
+                    <React.Fragment>
+                        <p><strong>1. Dessalga:</strong> Na véspera, limpe as carnes salgadas e deixe de molho em água fria, trocando a água de 3 a 4 vezes.</p>
+                        <p><strong>2. O Feijão:</strong> Escolha e lave o feijão preto. Deixe de molho por pelo menos 2 horas.</p>
+                        <p><strong>3. Cozimento Base:</strong> Em uma panela de fundo muito grosso (preferencialmente de ferro), coloque as carnes mais duras (carne seca) para cozinhar com o feijão e louro.</p>
+                        <p><strong>4. Camadas de Sabor:</strong> Após 40 minutos, adicione a costelinha e o lombo. Mais 20 minutos depois, adicione as linguiças e o paio.</p>
+                        <p><strong>5. O Refogado:</strong> Em uma frigideira à parte, doure bastante alho e cebola no azeite ou banha. Adicione duas conchas do caldo do feijão, amasse os grãos para engrossar e devolva à panela principal.</p>
+                        <p><strong>6. Finalização:</strong> Deixe ferver em fogo baixo até o caldo estar espesso e brilhante. Sirva fumegante.</p>
+                    </React.Fragment>
+                )
+            },
+            moqueca: {
+                title: "Moqueca",
+                image: "zmoqueca.png",
+                ingredients: [
+                    "1kg de postas de peixe (Robalo ou Cação)",
+                    "Suco de 2 limões",
+                    "2 cebolas grandes em rodelas",
+                    "3 tomates maduros em rodelas",
+                    "1 pimentão vermelho e 1 amarelo em rodelas",
+                    "200ml de leite de coco grosso",
+                    "3 colheres (sopa) de azeite de dendê",
+                    "Coentro fresco, sal e pimenta"
+                ],
+                instructions: (
+                    <React.Fragment>
+                        <p><strong>1. Marinada:</strong> Tempere o peixe com sal, pimenta e suco de limão. Deixe descansar por rápidos 15 minutos (não mais que isso para não cozinhar no ácido).</p>
+                        <p><strong>2. A Cama:</strong> Em uma panela de barro larga, faça uma cama com metade da cebola, tomate e pimentões.</p>
+                        <p><strong>3. Montagem:</strong> Acomode as postas de peixe sobre os vegetais. Cubra com o restante da cebola, tomate e pimentões.</p>
+                        <p><strong>4. O Caldo:</strong> Regue tudo com o leite de coco e o azeite de dendê. O dendê é a alma; ele dá a cor e o sabor terroso essenciais.</p>
+                        <p><strong>5. Cozimento:</strong> Leve ao fogo médio com a panela tampada por cerca de 20 a 25 minutos. NÃO MEXA. Apenas agite a panela levemente pelas alças para não desmanchar o peixe.</p>
+                        <p><strong>6. Finalização:</strong> Desligue o fogo e jogue uma chuva de coentro fresco por cima. A panela de barro continuará fervendo por minutos após desligada.</p>
+                    </React.Fragment>
+                )
+            },
+            strogonoff: {
+                title: "Strogonoff",
+                image: "zstrogonoff.png",
+                ingredients: [
+                    "600g de filé mignon em tiras grossas",
+                    "1 cebola média picada fina",
+                    "250g de cogumelos Paris frescos fatiados",
+                    "1 colher (sopa) de mostarda Dijon",
+                    "2 colheres (sopa) de ketchup de boa qualidade",
+                    "300g de creme de leite fresco",
+                    "1 dose de conhaque para flambar",
+                    "Manteiga, sal e pimenta-do-reino moída na hora"
+                ],
+                instructions: (
+                    <React.Fragment>
+                        <p><strong>1. Selagem Brutal:</strong> Aqueça a manteiga em uma frigideira bem larga até quase fumegar. Jogue as tiras de carne aos poucos para não juntar água. Doure de forma agressiva. Reserve a carne.</p>
+                        <p><strong>2. O Fundo de Panela:</strong> Na mesma frigideira, adicione um pouco mais de manteiga e sue a cebola até ficar translúcida. Adicione os cogumelos e salteie até dourarem.</p>
+                        <p><strong>3. Flambar (O Fogo):</strong> Volte a carne para a panela. Despeje o conhaque e incline levemente a frigideira para flambar (ou risque um fósforo). Deixe o álcool evaporar completamente.</p>
+                        <p><strong>4. O Molho:</strong> Incorpore a mostarda e o ketchup. Misture bem para envolver a carne nos sabores ácidos e doces.</p>
+                        <p><strong>5. A Textura:</strong> Abaixe o fogo ao mínimo e adicione o creme de leite fresco. Misture delicadamente. Aqueça mas não deixe ferver agressivamente para não talhar o creme.</p>
+                        <p><strong>6. O Serviço:</strong> Sirva imediatamente com arroz soltinho e batatas fritas bem crocantes.</p>
+                    </React.Fragment>
+                )
+            }
+        };
+
+        // Componentes React
+        const AccordionItem = ({ title, content, isOpen, onClick }) => {
+            return (
+                <div className="accordion-item">
+                    <button className={`accordion-header ${isOpen ? 'active' : ''}`} onClick={onClick}>
+                        {title}
+                        <span className="icon">+</span>
+                    </button>
+                    <div className="accordion-content">
+                        <p>{content}</p>
+                    </div>
+                </div>
+            );
+        };
+
+        const Navbar = () => {
+            const navigate = useNavigate();
+
+            const handleScroll = (e, targetId) => {
+                e.preventDefault();
+                
+                // Verifica se já estamos na rota principal (Home)
+                const isHome = window.location.hash === '#/' || window.location.hash === '' || window.location.hash === '#';
+                
+                if (!isHome) {
+                    // Navega de volta para a Home primeiro
+                    navigate('/');
+                    // Aguarda 100ms para a tela renderizar e depois rola para a seção
+                    setTimeout(() => {
+                        const el = document.getElementById(targetId);
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                } else {
+                    // Já está na Home, só fazer a rolagem suave
+                    const el = document.getElementById(targetId);
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+
+            return (
+                <header className="navbar">
+                    <div className="logo">SABOR BRUTAL</div>
+                    <nav>
+                        <a href="#" onClick={(e) => handleScroll(e, 'historia')}>A História</a>
+                        <a href="#" onClick={(e) => handleScroll(e, 'receitas')}>Obras Principais</a>
+                        <a href="#" onClick={(e) => handleScroll(e, 'faq')}>Dúvidas</a>
+                    </nav>
+                </header>
+            );
+        };
+
+        const Home = () => {
+            const [openFaq, setOpenFaq] = useState(null);
+
+            const toggleFaq = (index) => {
+                setOpenFaq(openFaq === index ? null : index);
+            };
+
+            const faqs = [
+                { q: "Qual é o segredo de uma boa Moqueca?", a: "O segredo está no tempo e no dendê. Não apresse o cozimento do peixe e nunca, sob nenhuma hipótese, deixe ferver demasiadamente para não desmanchar as postas. O coentro entra no fim, fresco e pungente." },
+                { q: "Posso usar feijão carioca na Feijoada?", a: "A verdadeira feijoada brasileira clama pelo feijão preto. A textura densa e a cor profunda que ele oferece são insubstituíveis para o caldo rico característico do prato." },
+                { q: "Qual o corte ideal para o Strogonoff?", a: "Filé mignon ou alcatra. Cortes macios e com pouca gordura fibrosa são essenciais. E lembre-se: a carne deve ser selada rapidamente em fogo altíssimo para reter os sucos." }
+            ];
+
+            return (
+                <main>
+                    <Navbar />
+                    <section id="historia" className="hero-section">
+                        <div className="hero-text">
+                            <h1 className="massive-title">Raízes<br/><i>&</i><br/>Fogo.</h1>
+                            <div className="hero-desc">
+                                <p>Nascemos do fogo cru e da lenha que estala. Acreditamos que a comida não deve ser apenas vista, mas sentida. Uma homenagem às receitas ancestrais que forjaram a nossa culinária, servidas sem filtros, sem atalhos.</p>
+                            </div>
+                        </div>
+                        <div className="hero-visual">
+                            <div className="solid-block red-block"></div>
+                        </div>
+                    </section>
+
+                    <section id="receitas" className="recipes-section">
+                        <h2 className="section-title">Obras Principais</h2>
+                        <div className="recipes-grid">
+                            {Object.keys(recipesData).map(key => (
+                                <Link to={`/recipe/${key}`} className="recipe-card" key={key}>
+                                    <div className="recipe-img-container">
+                                        <img src={recipesData[key].image} alt={recipesData[key].title} />
+                                    </div>
+                                    <div className="recipe-meta">
+                                        <h3>{recipesData[key].title}</h3>
+                                        <span className="action-text">Revelar Prato ↗</span>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section id="faq" className="faq-section">
+                        <h2 className="section-title">Dúvidas<br/><i>Frequentes</i></h2>
+                        <div className="accordion-container">
+                            {faqs.map((faq, index) => (
+                                <AccordionItem 
+                                    key={index}
+                                    title={faq.q}
+                                    content={faq.a}
+                                    isOpen={openFaq === index}
+                                    onClick={() => toggleFaq(index)}
+                                />
+                            ))}
+                        </div>
+                    </section>
+                </main>
+            );
+        };
+
+        const Recipe = () => {
+            const { id } = useParams();
+            const navigate = useNavigate();
+            const data = recipesData[id];
+
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, [id]);
+
+            if (!data) return <div style={{padding: '5rem', color: 'white'}}>Receita não encontrada.</div>;
+
+            return (
+                <div className="recipe-page">
+                    <div className="recipe-page-layout">
+                        <button onClick={() => navigate(-1)} className="back-button">← Voltar</button>
+                        <div className="recipe-visual">
+                            <img src={data.image} alt={data.title} />
+                        </div>
+                        <div className="recipe-info">
+                            <h1 className="massive-title">{data.title}</h1>
+                            
+                            <div className="recipe-details">
+                                <div className="ingredients">
+                                    <h3>Ingredientes</h3>
+                                    <ul>
+                                        {data.ingredients.map((ing, i) => (
+                                            <li key={i}>{ing}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="instructions">
+                                    <h3>Preparo</h3>
+                                    {data.instructions}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <HashRouter>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/recipe/:id" element={<Recipe />} />
+                    </Routes>
+                </HashRouter>
+            );
+        };
+
+        // Renderização Inicial
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
